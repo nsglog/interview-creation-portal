@@ -1,4 +1,4 @@
-package com.scaler.assignment.dtos;
+package com.scaler.assignment.dtos.requestdtos;
 
 import lombok.Getter;
 import lombok.Setter;
