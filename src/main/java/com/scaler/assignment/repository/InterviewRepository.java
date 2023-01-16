@@ -12,15 +12,13 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     @Override
     Interview save (Interview interview);
 
-    @Query(value = "SELECT * FROM interview WHERE booked_by_id = ?1 AND" +
+    @Query(value = "SELECT * FROM interview WHERE booked_by_id = ?1 OR " +
+            "booked_with_id = ?1 AND"+
             " end_time > ?2 AND" +
-            " start_time < ?3 ", nativeQuery = true)
+            " start_time < ?3 "
+             ,nativeQuery = true)
     List<Interview> findByBookedBy(Long userId, LocalDateTime start_time, LocalDateTime end_time);
 
-    @Query(value = "SELECT * FROM interview WHERE booked_with_id = ?1 AND" +
-            " end_time > ?2 AND" +
-            " start_time < ?3 ", nativeQuery = true)
-    List<Interview> findByBookedWith(Long userId, LocalDateTime start_time, LocalDateTime end_time);
 
     @Query(value = "SELECT * FROM interview WHERE booked_by_id = ?1 AND" +
             " end_time > ?2 AND" +

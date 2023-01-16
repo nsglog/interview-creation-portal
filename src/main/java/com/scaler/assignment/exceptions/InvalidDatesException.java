@@ -1,4 +1,4 @@
-package exceptions;
+package com.scaler.assignment.exceptions;
 
 public class InvalidDatesException extends Exception    {
 

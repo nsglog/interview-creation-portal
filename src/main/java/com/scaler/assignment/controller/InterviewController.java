@@ -2,15 +2,19 @@ package com.scaler.assignment.controller;
 
 import com.scaler.assignment.dtos.requestdtos.CreateInterviewRequestDto;
 import com.scaler.assignment.dtos.requestdtos.DeleteInterviewRequestDto;
+import com.scaler.assignment.dtos.requestdtos.GetListOfInterviewRequestDto;
 import com.scaler.assignment.dtos.requestdtos.UpdateInterviewRequestDto;
 import com.scaler.assignment.dtos.responsedtos.CreateInterviewResponseDto;
 import com.scaler.assignment.dtos.responsedtos.DeleteInterviewResponseDto;
+import com.scaler.assignment.dtos.responsedtos.GetListOfInterviewResponseDto;
 import com.scaler.assignment.dtos.responsedtos.UpdateInterviewResponseDto;
 import com.scaler.assignment.models.Interview;
 import com.scaler.assignment.services.InterviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class InterviewController {
@@ -19,6 +23,14 @@ public class InterviewController {
     @Autowired
     public InterviewController (InterviewService interviewService)   {
         this.interviewService = interviewService;
+    }
+
+    @GetMapping(value = "/interview")
+    public @ResponseBody GetListOfInterviewResponseDto getListOfInterview(GetListOfInterviewRequestDto requestDto) {
+        List<Interview> interviewList = interviewService.getListOfInterview (requestDto);
+        GetListOfInterviewResponseDto getListOfInterviewResponseDto = new GetListOfInterviewResponseDto();
+        getListOfInterviewResponseDto.setInterviewList(interviewList);
+        return getListOfInterviewResponseDto;
     }
 
     @PostMapping(value = "/interview")

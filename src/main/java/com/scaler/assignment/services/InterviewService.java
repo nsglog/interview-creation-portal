@@ -2,15 +2,16 @@ package com.scaler.assignment.services;
 
 import com.scaler.assignment.dtos.requestdtos.CreateInterviewRequestDto;
 import com.scaler.assignment.dtos.requestdtos.DeleteInterviewRequestDto;
+import com.scaler.assignment.dtos.requestdtos.GetListOfInterviewRequestDto;
 import com.scaler.assignment.dtos.requestdtos.UpdateInterviewRequestDto;
 import com.scaler.assignment.models.Interview;
 import com.scaler.assignment.models.User;
 import com.scaler.assignment.repository.InterviewRepository;
 import com.scaler.assignment.repository.UserRepository;
-import exceptions.ConflictOfTimingException;
-import exceptions.InterviewNotFoundException;
-import exceptions.InvalidDatesException;
-import exceptions.UserDoesNotExistException;
+import com.scaler.assignment.exceptions.ConflictOfTimingException;
+import com.scaler.assignment.exceptions.InterviewNotFoundException;
+import com.scaler.assignment.exceptions.InvalidDatesException;
+import com.scaler.assignment.exceptions.UserDoesNotExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,12 @@ public class InterviewService {
     public InterviewService (InterviewRepository interviewRepository, UserRepository userRepository)   {
         this.interviewRepository = interviewRepository;
         this.userRepository = userRepository;
+    }
+
+    public List<Interview> getListOfInterview(GetListOfInterviewRequestDto requestDto)  {
+
+        List<Interview> interviewList = interviewRepository.findAll();
+        return interviewList;
     }
 
     public Interview createInterview (CreateInterviewRequestDto requestDto) throws Exception {
@@ -60,16 +67,10 @@ public class InterviewService {
 
         System.out.println("debug 10+10+10");
 
-        List<Interview> interviewsBookedByRequestingUser = interviewRepository.findByBookedBy(requestingUser.getId(),
+        List<Interview> interviewsOfRequestingUser = interviewRepository.findByBookedBy(requestingUser.getId(),
                 interviewStartTime,
                 interviewEndTime);
-        List<Interview> interviewsBookedByRequestedUser = interviewRepository.findByBookedBy(requestedUser.getId(),
-                interviewStartTime,
-                interviewEndTime);
-        List<Interview> interviewsBookedWithRequestingUser = interviewRepository.findByBookedWith(requestingUser.getId(),
-                interviewStartTime,
-                interviewEndTime);
-        List<Interview> interviewsBookedWithRequestedUser = interviewRepository.findByBookedWith(requestedUser.getId(),
+        List<Interview> interviewsOfRequestedUser = interviewRepository.findByBookedBy(requestedUser.getId(),
                 interviewStartTime,
                 interviewEndTime);
 
@@ -79,11 +80,10 @@ public class InterviewService {
 
 
 
-        if(interviewsBookedByRequestingUser.isEmpty() && interviewsBookedByRequestedUser.isEmpty() &&
-            interviewsBookedWithRequestingUser.isEmpty() && interviewsBookedWithRequestedUser.isEmpty()) {
+        if(interviewsOfRequestingUser.isEmpty() && interviewsOfRequestedUser.isEmpty()) {
 
-            Interview interview = setInterview (interviewStartTime, interviewEndTime,
-                                                requestingUser, requestedUser);
+            Interview interview = new Interview();
+            setInterview (interview, interviewStartTime, interviewEndTime, requestingUser, requestedUser);
 
             return interview;
         }
@@ -91,18 +91,17 @@ public class InterviewService {
         throw new ConflictOfTimingException("One of user has already scheduled an interview at requested time interval. ");
     }
 
-    private Interview setInterview (LocalDateTime startTime, LocalDateTime endTime,
+    private Interview setInterview (Interview interview, LocalDateTime startTime, LocalDateTime endTime,
                                     User requestedBy, User requestedWith)    {
-        Interview interview = new Interview();
+
         interview.setStartTime(startTime);
         interview.setEndTime(endTime);
         interview.setBookedBy(requestedBy);
         interview.setBookedWith(requestedWith);
         interviewRepository.save(interview);
+
         return interview;
     }
-
-
 
     public Interview updateInterview (UpdateInterviewRequestDto requestDto, long id) throws Exception {
 
@@ -143,10 +142,8 @@ public class InterviewService {
 
         if(scheduledInterviewsOfRequestedUsers.isEmpty() &&
             scheduledInterviewsOfRequestingUser.isEmpty())  {
-            scheduledInterview.setStartTime(start);
-            scheduledInterview.setEndTime(end);
-            scheduledInterview.setBookedWith(bookWithUser);
-            scheduledInterview.setBookedBy(requestingUser);
+
+            setInterview(scheduledInterview, start, end, requestingUser, bookWithUser);
 
             return scheduledInterview;
         }
