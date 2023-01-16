@@ -26,7 +26,7 @@ public class InterviewController {
     }
 
     @GetMapping(value = "/interview")
-    public @ResponseBody GetListOfInterviewResponseDto getListOfInterview(GetListOfInterviewRequestDto requestDto) {
+    public @ResponseBody GetListOfInterviewResponseDto getListOfInterview(@RequestBody GetListOfInterviewRequestDto requestDto) {
         List<Interview> interviewList = interviewService.getListOfInterview (requestDto);
         GetListOfInterviewResponseDto getListOfInterviewResponseDto = new GetListOfInterviewResponseDto();
         getListOfInterviewResponseDto.setInterviewList(interviewList);
