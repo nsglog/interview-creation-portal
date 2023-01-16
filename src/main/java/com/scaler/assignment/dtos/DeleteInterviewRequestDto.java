@@ -1,7 +1,11 @@
 package com.scaler.assignment.dtos;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class DeleteInterviewRequestDto {
-    Long id;
-    String madeBy;
-    String madeWith;
+    private String madeBy;
+    private String madeWith;
 }

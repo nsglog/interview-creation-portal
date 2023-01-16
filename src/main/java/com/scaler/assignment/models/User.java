@@ -13,9 +13,6 @@ import java.util.List;
 public class User extends BaseModel {
     String name;
     String gender;
-    String dob;
+    Date dob;
     String e_mail;
-//    @ManyToMany
-    @ManyToMany
-    List<Interview> interviews;
 }
