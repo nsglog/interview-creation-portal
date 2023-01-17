@@ -2,7 +2,6 @@ package com.scaler.assignment.services;
 
 import com.scaler.assignment.dtos.requestdtos.CreateInterviewRequestDto;
 import com.scaler.assignment.dtos.requestdtos.DeleteInterviewRequestDto;
-import com.scaler.assignment.dtos.requestdtos.GetListOfInterviewRequestDto;
 import com.scaler.assignment.dtos.requestdtos.UpdateInterviewRequestDto;
 import com.scaler.assignment.models.Interview;
 import com.scaler.assignment.models.User;
@@ -29,7 +28,7 @@ public class InterviewService {
         this.userRepository = userRepository;
     }
 
-    public List<Interview> getListOfInterview(GetListOfInterviewRequestDto requestDto)  {
+    public List<Interview> getListOfInterview()  {
 
         List<Interview> interviewList = interviewRepository.findAll();
         return interviewList;
@@ -42,6 +41,8 @@ public class InterviewService {
         Long requestingUserId = requestDto.getRequestedById();
         Long requestedUserId = requestDto.getRequestedToId();
 
+
+
         System.out.println("first user id" + requestingUserId);
         System.out.println("second user id" + requestedUserId);
 
@@ -52,7 +53,7 @@ public class InterviewService {
             throw new UserDoesNotExistException("Invalid Id/ User does not exist");
         }
 
-        System.out.println("debug 9+9+9");
+//        System.out.println("debug 9+9+9");
 
         User requestingUser = userRequesting.get();
         User requestedUser = userRequested.get();
@@ -65,8 +66,6 @@ public class InterviewService {
             throw new InvalidDatesException ("Dates provided are invalid");
         }
 
-        System.out.println("debug 10+10+10");
-
         List<Interview> interviewsOfRequestingUser = interviewRepository.findByBookedBy(requestingUser.getId(),
                 interviewStartTime,
                 interviewEndTime);
@@ -74,11 +73,7 @@ public class InterviewService {
                 interviewStartTime,
                 interviewEndTime);
 
-        System.out.println("debug 11+11+11");
-
-//        System.out.println("size lists"+requestingUserInterviews.size()+" "+requestingUserInterviews.size());
-
-
+        System.out.println(interviewsOfRequestingUser.size()+" "+interviewsOfRequestedUser.size());
 
         if(interviewsOfRequestingUser.isEmpty() && interviewsOfRequestedUser.isEmpty()) {
 

@@ -9,6 +9,5 @@ import org.springframework.http.HttpStatus;
 @Setter
 public class UpdateInterviewResponseDto {
     private Interview interview;
-    private HttpStatus httpStatus;
     private String message;
 }

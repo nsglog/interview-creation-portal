@@ -8,6 +8,5 @@ import java.util.List;
 @Getter
 @Setter
 public class GetListOfInterviewResponseDto {
-
-    List<Interview> interviewList;
+    private List<Interview> interviewList;
 }
