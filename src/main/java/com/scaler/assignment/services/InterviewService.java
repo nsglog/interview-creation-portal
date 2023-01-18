@@ -3,14 +3,11 @@ package com.scaler.assignment.services;
 import com.scaler.assignment.dtos.requestdtos.CreateInterviewRequestDto;
 import com.scaler.assignment.dtos.requestdtos.DeleteInterviewRequestDto;
 import com.scaler.assignment.dtos.requestdtos.UpdateInterviewRequestDto;
+import com.scaler.assignment.exceptions.*;
 import com.scaler.assignment.models.Interview;
 import com.scaler.assignment.models.User;
 import com.scaler.assignment.repository.InterviewRepository;
 import com.scaler.assignment.repository.UserRepository;
-import com.scaler.assignment.exceptions.ConflictOfTimingException;
-import com.scaler.assignment.exceptions.InterviewNotFoundException;
-import com.scaler.assignment.exceptions.InvalidDatesException;
-import com.scaler.assignment.exceptions.UserDoesNotExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,39 +38,45 @@ public class InterviewService {
         Long requestingUserId = requestDto.getRequestedById();
         Long requestedUserId = requestDto.getRequestedToId();
 
-
-
-        System.out.println("first user id" + requestingUserId);
-        System.out.println("second user id" + requestedUserId);
-
-        Optional<User> userRequesting = userRepository.findById(requestingUserId);
-        Optional<User> userRequested = userRepository.findById(requestedUserId);
-
-        if(userRequesting.isEmpty() || userRequested.isEmpty()) {
-            throw new UserDoesNotExistException("Invalid Id/ User does not exist");
-        }
-
-//        System.out.println("debug 9+9+9");
-
-        User requestingUser = userRequesting.get();
-        User requestedUser = userRequested.get();
+        User requestingUser = userRepository.findById(requestingUserId).get();
+        User requestedUser = userRepository.findById(requestedUserId).get();
 
         LocalDateTime interviewStartTime = requestDto.getStartTime();
         LocalDateTime interviewEndTime = requestDto.getEndTime();
 
         if(interviewStartTime.compareTo(interviewEndTime) >= 0 ||
                 interviewStartTime.compareTo(LocalDateTime.now()) < 0) {
-            throw new InvalidDatesException ("Dates provided are invalid");
+            throw new InvalidDatesException ("Invalid Dates");
         }
 
-        List<Interview> interviewsOfRequestingUser = interviewRepository.findByBookedBy(requestingUser.getId(),
+        if(requestingUser.equals(requestedUser)) {
+            throw new SameUserException("You cannot set meeting with yourself. Talk to mirror better go see a doctor");
+        }
+
+        System.out.println(interviewStartTime+" "+interviewEndTime);
+
+        List<Interview> interviewsOfRequestingUser = interviewRepository.getInterviewList(requestingUser.getId(),
                 interviewStartTime,
                 interviewEndTime);
-        List<Interview> interviewsOfRequestedUser = interviewRepository.findByBookedBy(requestedUser.getId(),
+        List<Interview> interviewsOfRequestedUser = interviewRepository.getInterviewList(requestedUser.getId(),
                 interviewStartTime,
                 interviewEndTime);
 
-        System.out.println(interviewsOfRequestingUser.size()+" "+interviewsOfRequestedUser.size());
+        for(Interview interview : interviewsOfRequestedUser)    {
+
+            System.out.println("booked by "+interview.getBookedBy().getId()
+                    +"booked with "+interview.getBookedWith().getId()
+                    +"start date and time "+interview.getStartTime()
+                    +"end date and time " + interview.getEndTime());
+        }
+
+        for(Interview interview : interviewsOfRequestingUser)    {
+
+            System.out.println("booked by "+interview.getBookedBy().getId()
+                    +" booked with "+interview.getBookedWith().getId()
+                    +" start date and time "+interview.getStartTime()
+                    +" end date and time " + interview.getEndTime());
+        }
 
         if(interviewsOfRequestingUser.isEmpty() && interviewsOfRequestedUser.isEmpty()) {
 
@@ -116,6 +119,10 @@ public class InterviewService {
 
         User bookWithUser = user.get();
         User requestingUser = scheduledInterview.getBookedBy();
+
+        if(bookWithUser.equals(requestingUser)) {
+            throw new SameUserException("You cannot set meeting with yourself. Talk to mirror better go see a doctor");
+        }
 
         LocalDateTime start = requestDto.getNewStartTime();
         LocalDateTime end = requestDto.getNewEndTime();

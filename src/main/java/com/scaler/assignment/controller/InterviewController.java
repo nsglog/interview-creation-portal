@@ -37,17 +37,13 @@ public class InterviewController {
 
     @PostMapping(value = "/interview")
     public @ResponseBody CreateInterviewResponseDto createInterview (@RequestBody CreateInterviewRequestDto requestDto) {
-
-        System.out.println(requestDto.getRequestedById());
-        System.out.println(requestDto.getRequestedToId());
-        System.out.println(requestDto.getStartTime());
-        System.out.println(requestDto.getEndTime());
         Interview upcomingInterview;
         CreateInterviewResponseDto createInterviewResponseDto = new CreateInterviewResponseDto();
 
         try {
             upcomingInterview = interviewService.createInterview(requestDto);
             createInterviewResponseDto.setInterview(upcomingInterview);
+            createInterviewResponseDto.setMessage("Interview created successfully");
         }
         catch (Exception exception) {
             createInterviewResponseDto.setMessage(exception.getMessage());
